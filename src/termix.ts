@@ -15,11 +15,11 @@ export class TermixSubject<S> extends BehaviorSubject<S> {
   }
 
   /**
-	 * Dispatch state, optionally with data argument
-	 * EXAMPLES:
-	 * - store.$dispatch(updateQuery)
-	 * - store.$dispatch(updateQuery, 'food')
-	 */
+     * Dispatch state, optionally with data argument
+     * EXAMPLES:
+     * - store.$dispatch(updateQuery)
+     * - store.$dispatch(updateQuery, 'food')
+     */
   $dispatch<DATA>(fn: (n: S, arg?: DATA) => S, arg?: DATA) {
     // latest data
     const state: S = super.getValue()
@@ -44,25 +44,21 @@ export class TermixSubject<S> extends BehaviorSubject<S> {
   }
 }
 
-export class Termix<T> {
+export class Termix {
   private _stores: TermixItem<any>[] = []
 
-  constructor(stores: T | TermixItemType<keyof T>[]) {
-    if (Array.isArray(stores)) {
-      for (const store of stores) {
-        this._stores.push({
-          type: store, // type of value
-          value: new TermixSubject(store)
-        })
-      }
-    } else {
-      throw new TypeError("Wrong type of stores data. Array is expected.")
+  constructor(stores: any[]) {
+    for (const store of stores) {
+      this._stores.push({
+        type: store, // type of value
+        value: new TermixSubject(store)
+      })
     }
   }
 
   /**
-	 * Select store by given type
-	 */
+     * Select store by given type
+     */
   select<S>(type: TermixItemType<S>): TermixSubject<S> {
     for (const item of this._stores) {
       if (item.type instanceof type) {

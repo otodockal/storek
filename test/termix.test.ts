@@ -140,15 +140,6 @@ describe("Termix test", () => {
     store.$dispatch(setQuery, "oto")
     store1.$dispatch(updateOne)
   })
-
-  it("should throw error", () => {
-    try {
-      const termix = new Termix(<any>{})
-    } catch (error) {
-      const e: TypeError = error
-      expect(e.message).toBe("Wrong type of stores data. Array is expected.")
-    }
-  })
 })
 
 function _toPOJO(value) {
