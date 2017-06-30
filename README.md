@@ -8,7 +8,7 @@
 ## Examples
 [test/termix.test.ts](test/termix.test.ts)
 
-# Implementation Reasoning
+## Implementation Reasoning
 - I know, inheritance of rxjs BehaviorSubject over composition is not the best idea. DX can suffer, it is mitigated by using "$" prefix for custom methods.
 - From my testing...   
     - version with inheritance (current) can look like this
