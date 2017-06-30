@@ -1,7 +1,7 @@
-import { Termix } from "../src/termix"
+import { Termix, TermixSubject } from "../src/termix"
 import { Observable, Subscription } from "rxjs"
 
-// Functions
+// Example #1
 class MyStore {
   one = 1
   two = 2
@@ -13,13 +13,12 @@ function updateOne(state: MyStore) {
   }
 }
 
+// Example #2
+type FilterStoreType = "red" | "blue" | "green"
+
 class FilterStore {
   query = ""
-  statuses = []
-  industries = []
-  types = []
-  channels = []
-  liked = false
+  types: FilterStoreType[] = []
 }
 
 function setQuery(state: FilterStore, query: string) {
@@ -29,77 +28,75 @@ function setQuery(state: FilterStore, query: string) {
   }
 }
 
-export const arr = [new MyStore(), new FilterStore()]
+function addType(state: FilterStore, type: FilterStoreType) {
+  return {
+    ...state,
+    types: [...state.types, type]
+  }
+}
+
+function deleteType(state: FilterStore, type: FilterStoreType) {
+  return {
+    ...state,
+    types: state.types.filter(item => item !== type)
+  }
+}
+
+export const listOfStores = [new MyStore(), new FilterStore()]
 
 describe("Termix test", () => {
   it("should select MyStore", () => {
-    const termix = new Termix(arr)
+    const termix = new Termix(listOfStores)
     const store = termix.select(MyStore)
-    expect(_toPOJO(store.$value)).toEqual({ one: 1, two: 2 })
+    expect(store.$value).toEqual({ one: 1, two: 2 })
   })
 
   it("should select FilterStore", () => {
-    const termix = new Termix(arr)
+    const termix = new Termix(listOfStores)
     const store = termix.select(FilterStore)
-    expect(_toPOJO(store.$value)).toEqual({
+    expect(store.$value).toEqual({
       query: "",
-      statuses: [],
-      industries: [],
-      types: [],
-      channels: [],
-      liked: false
+      types: []
     })
   })
 
   it("should update MyStore without action value", () => {
-    const termix = new Termix(arr)
+    const termix = new Termix(listOfStores)
     const store = termix.select(MyStore)
 
-    expect(_toPOJO(store.$value)).toEqual({ one: 1, two: 2 })
+    expect(store.$value).toEqual({ one: 1, two: 2 })
 
     store.$dispatch(updateOne)
 
-    expect(_toPOJO(store.$value)).toEqual({ one: 2, two: 2 })
+    expect(store.$value).toEqual({ one: 2, two: 2 })
   })
 
   it("should set/reset prop of FilterStore", () => {
-    const termix = new Termix(arr)
+    const termix = new Termix(listOfStores)
     const store = termix.select(FilterStore)
 
-    expect(_toPOJO(store.$value)).toEqual({
+    expect(store.$value).toEqual({
       query: "",
-      statuses: [],
-      industries: [],
-      types: [],
-      channels: [],
-      liked: false
+      types: []
     })
 
     store.$dispatch(setQuery, "cool")
 
-    expect(_toPOJO(store.$value)).toEqual({
+    expect(store.$value).toEqual({
       query: "cool",
-      statuses: [],
-      industries: [],
-      types: [],
-      channels: [],
-      liked: false
+      types: []
     })
 
     store.$reset()
 
-    expect(_toPOJO(store.$value)).toEqual({
+    expect(store.$value).toEqual({
       query: "",
-      statuses: [],
-      industries: [],
-      types: [],
-      channels: [],
-      liked: false
+      types: []
     })
   })
 
   it("should combine stores", () => {
-    const termix = new Termix(arr)
+    const termix = new Termix(listOfStores)
     const store = termix.select(FilterStore)
     const store1 = termix.select(MyStore)
 
@@ -107,15 +104,11 @@ describe("Termix test", () => {
       store.skip(1),
       store1.skip(1)
     ).subscribe(([val1, val2]) => {
-      expect(_toPOJO(val1)).toEqual({
+      expect(val1).toEqual({
         query: "oto",
-        statuses: [],
-        industries: [],
-        types: [],
-        channels: [],
-        liked: false
+        types: []
       })
-      expect(_toPOJO(val2)).toEqual({ one: 2, two: 2 })
+      expect(val2).toEqual({ one: 2, two: 2 })
       obs.unsubscribe()
     })
 
@@ -124,7 +117,7 @@ describe("Termix test", () => {
   })
 
   it("should combine stores and pick only particular part of a store", done => {
-    const termix = new Termix(arr)
+    const termix = new Termix(listOfStores)
     const store = termix.select(FilterStore)
     const store1 = termix.select(MyStore)
 
@@ -140,8 +133,26 @@ describe("Termix test", () => {
     store.$dispatch(setQuery, "oto")
     store1.$dispatch(updateOne)
   })
-})
 
-function _toPOJO(value) {
-  return JSON.parse(JSON.stringify(value))
-}
+  it("should add / delete type", () => {
+    const termix = new Termix(listOfStores)
+    const store = termix.select(FilterStore)
+
+    store.$dispatch(addType, "red")
+    store.$dispatch(addType, "green")
+
+    expect(store.$value.types).toEqual(["red", "green"])
+
+    store.$dispatch(deleteType, "red")
+
+    expect(store.$value.types).toEqual(["green"])
+  })
+
+  it("should use only TermixSubject", () => {
+    const store = new TermixSubject(new MyStore())
+
+    store.$dispatch(updateOne)
+
+    expect(store.$value.one).toBe(2)
+  })
+})

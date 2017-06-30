@@ -6,8 +6,10 @@ interface TermixItem<S> {
 }
 
 export interface TermixItemType<T> {
-  new (...args: any[]): T
+  new (arg): T
 }
+
+export type TermixDispatchArgData<T> = { [P in keyof T]: T[P] }
 
 export class TermixSubject<S> extends BehaviorSubject<S> {
   constructor(private _initialState: S) {
@@ -15,12 +17,15 @@ export class TermixSubject<S> extends BehaviorSubject<S> {
   }
 
   /**
-     * Dispatch state, optionally with data argument
-     * EXAMPLES:
-     * - store.$dispatch(updateQuery)
-     * - store.$dispatch(updateQuery, 'food')
-     */
-  $dispatch<DATA>(fn: (n: S, arg?: DATA) => S, arg?: DATA) {
+       * Dispatch state, optionally with data argument
+       * EXAMPLES:
+       * - store.$dispatch(updateQuery)
+       * - store.$dispatch(updateQuery, 'food')
+       */
+  $dispatch<DATA>(
+    fn: (n: S, arg?: DATA) => S,
+    arg?: TermixDispatchArgData<DATA>
+  ) {
     // latest data
     const state: S = super.getValue()
     // middleware function
@@ -30,15 +35,15 @@ export class TermixSubject<S> extends BehaviorSubject<S> {
   }
 
   /**
-     * Reset state
-     */
+       * Reset state
+       */
   $reset() {
     super.next(this._initialState)
   }
 
   /**
-     * Get snapshot of current state
-     */
+       * Get snapshot of current state
+       */
   get $value() {
     return super.getValue()
   }
@@ -57,8 +62,8 @@ export class Termix {
   }
 
   /**
-     * Select store by given type
-     */
+       * Select store by given type
+       */
   select<S>(type: TermixItemType<S>): TermixSubject<S> {
     for (const item of this._stores) {
       if (item.type instanceof type) {
