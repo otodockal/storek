@@ -1,70 +1,72 @@
 import { BehaviorSubject } from "rxjs/BehaviorSubject"
+import { Observable } from "rxjs/Observable"
 
 interface TermixItem<S> {
-  type: TermixItemType<S>
-  value: TermixSubject<S>
+  type: { new (arg): S }
+  value: Termix<S>
 }
 
-export interface TermixItemType<T> {
-  new (arg): T
-}
+export class Termix<S> {
+  private _subject = new BehaviorSubject<S>(this._initialState)
 
-export type TermixDispatchArgData<T> = { [P in keyof T]: T[P] }
-
-export class TermixSubject<S> extends BehaviorSubject<S> {
-  constructor(private _initialState: S) {
-    super(_initialState)
-  }
+  constructor(private _initialState: S) {}
 
   /**
-       * Dispatch state, optionally with data argument
-       * EXAMPLES:
-       * - store.$dispatch(updateQuery)
-       * - store.$dispatch(updateQuery, 'food')
-       */
-  $dispatch<DATA>(
+     * Dispatch state, optionally with data argument
+     * EXAMPLES:
+     * - store.$dispatch(updateQuery)
+     * - store.$dispatch(updateQuery, 'food')
+     */
+  dispatch<DATA>(
     fn: (n: S, arg?: DATA) => S,
-    arg?: TermixDispatchArgData<DATA>
+    arg?: { [P in keyof DATA]: DATA[P] }
   ) {
     // latest data
-    const state: S = super.getValue()
+    const state: S = this._subject.getValue()
     // middleware function
     const processedValue = fn.call(null, state, arg)
     // emit
-    super.next(processedValue)
+    this._subject.next(processedValue)
   }
 
   /**
-       * Reset state
-       */
-  $reset() {
-    super.next(this._initialState)
+     * Reset state
+     */
+  reset() {
+    this._subject.next(this._initialState)
   }
 
   /**
-       * Get snapshot of current state
-       */
-  get $value() {
-    return super.getValue()
+     * An observable of the state
+     */
+  get $() {
+    return this._subject.asObservable()
+  }
+
+  /**
+     * Snapshot of current state
+     */
+  get snapshot() {
+    return this._subject.getValue()
   }
 }
 
-export class Termix {
+export class TermixStore {
   private _stores: TermixItem<any>[] = []
 
   constructor(stores: any[]) {
     for (const store of stores) {
       this._stores.push({
         type: store, // type of value
-        value: new TermixSubject(store)
+        value: new Termix(store)
       })
     }
   }
 
   /**
-       * Select store by given type
-       */
-  select<S>(type: TermixItemType<S>): TermixSubject<S> {
+     * Select store by given type
+     */
+  select<S>(type: { new (arg): S }): Termix<S> {
     for (const item of this._stores) {
       if (item.type instanceof type) {
         return item.value
