@@ -42,7 +42,8 @@ function deleteType(state: FilterState, type: FilterStateType) {
   }
 }
 
-export const listOfStates = [new MySimpleState(), new FilterState()]
+// declare list of stores for your TermixStore
+export const listOfStates = [MySimpleState, FilterState]
 
 describe("Termix test", () => {
   it("should select MyStore", () => {

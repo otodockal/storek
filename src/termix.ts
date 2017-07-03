@@ -12,16 +12,16 @@ export class Termix<S> {
   constructor(private _initialState: S) {}
 
   /**
-     * Dispatch state, optionally with data argument
-     * EXAMPLES:
-     * - store.$dispatch(updateQuery)
-     * - store.$dispatch(updateQuery, 'food')
-     */
+       * Dispatch state, optionally with data argument
+       * EXAMPLES:
+       * - store.$dispatch(updateQuery)
+       * - store.$dispatch(updateQuery, 'food')
+       */
   dispatch<DATA>(
     fn: (n: S, arg?: DATA) => S,
     arg?: { [P in keyof DATA]: DATA[P] }
   ) {
-    // latest data
+    // latest state
     const state: S = this._subject.getValue()
     // middleware function
     const processedValue = fn.call(null, state, arg)
@@ -30,22 +30,22 @@ export class Termix<S> {
   }
 
   /**
-     * Reset state
-     */
+       * Reset state
+       */
   reset() {
     this._subject.next(this._initialState)
   }
 
   /**
-     * An observable of the state
-     */
+       * An observable of the state
+       */
   get $() {
     return this._subject.asObservable()
   }
 
   /**
-     * Snapshot of current state
-     */
+       * Snapshot of current state
+       */
   get snapshot() {
     return this._subject.getValue()
   }
@@ -56,16 +56,17 @@ export class TermixStore {
 
   constructor(stores: any[]) {
     for (const store of stores) {
+      const s = new store()
       this._stores.push({
-        type: store, // type of value
-        value: new Termix(store)
+        type: s,
+        value: new Termix(s)
       })
     }
   }
 
   /**
-     * Select store by given type
-     */
+       * Select store by given type
+       */
   select<S>(type: { new (arg): S }): Termix<S> {
     for (const item of this._stores) {
       if (item.type instanceof type) {
