@@ -149,7 +149,7 @@ describe("Termix test", () => {
     expect(store.snapshot.types).toEqual(["green"])
   })
 
-  it("should use only TermixSubject", () => {
+  it("should use only Termix", () => {
     const store = new Termix(new MySimpleState())
 
     store.dispatch(updateOne)
