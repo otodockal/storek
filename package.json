@@ -3,9 +3,9 @@
   "version": "4.0.2",
   "description": "Type safety observable store for any app.",
   "keywords": [],
-  "main": "dist/termix.umd.js",
-  "module": "dist/termix.es5.js",
-  "typings": "dist/termix.d.ts",
+  "main": "./dist/termix.umd.js",
+  "module": "./dist/termix.es5.js",
+  "types": "./dist/termix.d.ts",
   "files": [
     "dist"
   ],
