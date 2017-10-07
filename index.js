@@ -1,2 +1,2 @@
 
-export * from './dist/termix.es5';
+export * from './dist/termix';

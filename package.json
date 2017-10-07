@@ -4,7 +4,7 @@
   "description": "Type safety observable store for any app.",
   "keywords": [],
   "main": "./dist/termix.umd.js",
-  "module": "./dist/termix.es5.js",
+  "module": "./dist/termix.js",
   "files": [
     "dist",
     "index.d.ts",
