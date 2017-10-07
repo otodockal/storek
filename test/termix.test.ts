@@ -1,5 +1,5 @@
-import { Termix, TermixStore } from "../src/termix"
-import { Observable, Subscription } from "rxjs"
+import { Termix, TermixStore } from '../src/termix'
+import { Observable, Subscription } from 'rxjs'
 
 // Example #1
 class MySimpleState {
@@ -14,10 +14,10 @@ function updateOne(state: MySimpleState) {
 }
 
 // Example #2
-type FilterStateType = "red" | "blue" | "green"
+type FilterStateType = 'red' | 'blue' | 'green'
 
 class FilterState {
-  query = ""
+  query = ''
   types: FilterStateType[] = []
 }
 
@@ -45,23 +45,23 @@ function deleteType(state: FilterState, type: FilterStateType) {
 // declare list of stores for your TermixStore
 export const listOfStates = [MySimpleState, FilterState]
 
-describe("Termix test", () => {
-  it("should select MyStore", () => {
+describe('Termix test', () => {
+  it('should select MyStore', () => {
     const termixStore = new TermixStore(listOfStates)
     const store = termixStore.select(MySimpleState)
     expect(store.snapshot).toEqual({ one: 1, two: 2 })
   })
 
-  it("should select FilterStore", () => {
+  it('should select FilterStore', () => {
     const termix = new TermixStore(listOfStates)
     const store = termix.select(FilterState)
     expect(store.snapshot).toEqual({
-      query: "",
+      query: '',
       types: []
     })
   })
 
-  it("should update MyStore without action value", () => {
+  it('should update MyStore without action value', () => {
     const termixStore = new TermixStore(listOfStates)
     const store = termixStore.select(MySimpleState)
 
@@ -72,31 +72,31 @@ describe("Termix test", () => {
     expect(store.snapshot).toEqual({ one: 2, two: 2 })
   })
 
-  it("should set/reset prop of FilterStore", () => {
+  it('should set/reset prop of FilterStore', () => {
     const termixStore = new TermixStore(listOfStates)
     const store = termixStore.select(FilterState)
 
     expect(store.snapshot).toEqual({
-      query: "",
+      query: '',
       types: []
     })
 
-    store.dispatch(setQuery, "cool")
+    store.dispatch(setQuery, 'cool')
 
     expect(store.snapshot).toEqual({
-      query: "cool",
+      query: 'cool',
       types: []
     })
 
     store.reset()
 
     expect(store.snapshot).toEqual({
-      query: "",
+      query: '',
       types: []
     })
   })
 
-  it("should combine stores", () => {
+  it('should combine stores', () => {
     const termixStore = new TermixStore(listOfStates)
     const store = termixStore.select(FilterState)
     const store1 = termixStore.select(MySimpleState)
@@ -106,18 +106,18 @@ describe("Termix test", () => {
       store1.$.skip(1)
     ).subscribe(([val1, val2]) => {
       expect(val1).toEqual({
-        query: "oto",
+        query: 'oto',
         types: []
       })
       expect(val2).toEqual({ one: 2, two: 2 })
       obs.unsubscribe()
     })
 
-    store.dispatch(setQuery, "oto")
+    store.dispatch(setQuery, 'oto')
     store1.dispatch(updateOne)
   })
 
-  it("should combine stores and pick only particular part of a store", done => {
+  it('should combine stores and pick only particular part of a store', done => {
     const termixStore = new TermixStore(listOfStates)
     const store = termixStore.select(FilterState)
     const store1 = termixStore.select(MySimpleState)
@@ -126,30 +126,30 @@ describe("Termix test", () => {
       store.$.skip(1).map(item => item.query),
       store1.$.skip(1).map(item => item.one)
     ).subscribe(res => {
-      expect(res).toEqual(["oto", 2])
+      expect(res).toEqual(['oto', 2])
       obs.unsubscribe()
       done()
     })
 
-    store.dispatch(setQuery, "oto")
+    store.dispatch(setQuery, 'oto')
     store1.dispatch(updateOne)
   })
 
-  it("should add / delete type", () => {
+  it('should add / delete type', () => {
     const termixStore = new TermixStore(listOfStates)
     const store = termixStore.select(FilterState)
 
-    store.dispatch(addType, "red")
-    store.dispatch(addType, "green")
+    store.dispatch(addType, 'red')
+    store.dispatch(addType, 'green')
 
-    expect(store.snapshot.types).toEqual(["red", "green"])
+    expect(store.snapshot.types).toEqual(['red', 'green'])
 
-    store.dispatch(deleteType, "red")
+    store.dispatch(deleteType, 'red')
 
-    expect(store.snapshot.types).toEqual(["green"])
+    expect(store.snapshot.types).toEqual(['green'])
   })
 
-  it("should use only Termix", () => {
+  it('should use only Termix', () => {
     const store = new Termix(new MySimpleState())
 
     store.dispatch(updateOne)
