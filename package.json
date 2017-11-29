@@ -1,7 +1,7 @@
 {
   "name": "termix",
-  "version": "4.0.5",
-  "description": "Type safety observable store for any app.",
+  "version": "4.0.6",
+  "description": "Observable store",
   "keywords": [],
   "main": "./dist/termix.umd.js",
   "module": "./dist/termix.js",
